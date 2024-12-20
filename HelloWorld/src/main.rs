@@ -1,3 +1,7 @@
+use bevy::prelude::*;
+
 fn main() {
-    println!("Hello, world!");
+    App::new()
+        .add_plugins(DefaultPlugins) // 基本的なプラグインを追加
+        .run();
 }
