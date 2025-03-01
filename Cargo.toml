@@ -2,7 +2,7 @@ license = "MIT OR Apache-2.0"
 
 [workspace]
 members = [
-    "examples/examples01",
+    "examples/examples01", "examples/examples02",
 ]
 
 [workspace.package]
