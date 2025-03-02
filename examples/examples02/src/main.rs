@@ -18,7 +18,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(create_window_plugin())) // 基本的なプラグインを追加
         .insert_resource(Time::<Fixed>::from_seconds(1.0)) // RunFixedMainLoopの更新間隔を設定
         .add_systems(Startup, setup) // 初期化のスケジュールにシステムを登録
-        .add_systems(Update, update_sprite_position)
+        .add_systems(Update, (update_sprite_position, collision_screen))
         .run();
 }
 
@@ -64,6 +64,37 @@ fn update_sprite_position(time: Res<Time>, mut sprite: Query<(&Direction, &mut T
         match direction {
             Direction::Right => transform.translation.x += VELOCITY_X * time.delta_secs(),
             Direction::Left => transform.translation.x -= VELOCITY_X * time.delta_secs(),
+        }
+    }
+}
+
+fn collision_screen(
+    orthographic_projection: Query<(&OrthographicProjection)>,
+    mut query_sprite: Query<(&Sprite, &mut Direction, &Transform)>,
+) {
+    if let Err(_) = orthographic_projection.get_single() {
+        return;
+    }
+
+    let area = orthographic_projection.get_single().unwrap().area;
+    for (sprite, mut direction, transform) in query_sprite.iter_mut() {
+        if let None = sprite.custom_size {
+            continue;
+        }
+        let offset = sprite.custom_size.unwrap().x / 2.0;
+        match *direction {
+            Direction::Right => {
+                let right = transform.translation.x + offset;
+                if area.max.x <= right {
+                    *direction = Direction::Left;
+                }
+            }
+            Direction::Left => {
+                let left = transform.translation.x - offset;
+                if left <= area.min.x {
+                    *direction = Direction::Right;
+                }
+            }
         }
     }
 }
