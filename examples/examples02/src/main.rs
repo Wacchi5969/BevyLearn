@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use bevy::window::{PresentMode, WindowTheme};
+use std::env;
 
 fn main() {
+    // アセットのルートディレクトリを設定
+    env::set_var("BEVY_ASSET_ROOT", "../../");
     App::new()
         .add_plugins(DefaultPlugins.set(create_window_plugin())) // 基本的なプラグインを追加
         .insert_resource(Time::<Fixed>::from_seconds(1.0)) // RunFixedMainLoopの更新間隔を設定
@@ -30,7 +33,12 @@ fn create_window_plugin() -> WindowPlugin {
     }
 }
 
-fn setup(mut commands: Commands) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // カメラを配置
     commands.spawn(Camera2d::default());
+
+    commands.spawn((
+        Sprite::from_image(asset_server.load("images/icon.png")),
+        Transform::from_translation(Vec3::new(0.0, 0.0, 0.0)),
+    ));
 }
